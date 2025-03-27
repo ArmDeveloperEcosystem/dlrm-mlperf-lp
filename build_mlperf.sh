@@ -41,7 +41,7 @@ if [ -d "/opt/conda" ]; then
     echo "Miniconda is already installed at /opt/conda. Skipping installation."
 else
     echo "Miniconda not found. Proceeding with installation..."
-    
+
     wget -O "$HOME/miniconda.sh" https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
     chmod +x "$HOME/miniconda.sh"
     # Install Miniconda silently (-b flag)
@@ -53,43 +53,12 @@ else
     echo "Miniconda installation completed."
 fi
 
-
-/opt/conda/bin/conda install -y python=3.10.12
-/opt/conda/bin/conda config --add channels conda-forge
-/opt/conda/bin/conda install -y -c conda-forge cmake==3.26.3 \
-                                                gperftools==2.10 \
-                                                numpy==1.25.2 \
-                                                ninja==1.10.2 \
-                                                pyyaml==6.0 \
-                                                setuptools==68.0.0 \
-                                                cffi==1.15.1 \
-                                                typing_extensions==4.7.1 \
-                                                future==0.18.3 \
-                                                six==1.16.0 \
-                                                requests==2.31.0 \
-                                                dataclasses==0.8 \
-                                                psutil==5.9.0 \
-                                                chardet \
-                                        --no-update-deps
-
 /opt/conda/bin/conda clean -ya
 
 export PATH="/opt/conda/bin:$PATH"
 echo 'export PATH="/opt/conda/bin:$PATH"' >> ~/.bashrc
 
-pip install -e git+https://github.com/mlperf/logging@3.0.0-rc2#egg=mlperf-logging
-pip install -U 'git+https://github.com/facebookresearch/iopath'
-pip install absl-py==1.4.0 \
-            typing-extensions \
-                tqdm==4.65.0 \
-                onnx==1.14.0 \
-                lark-parser==0.12.0 \
-                hypothesis==6.82.0 \
-                pyre-extensions==0.0.30 \
-                scikit-learn==1.3.0 \
-                pybind11==2.11.1 \
-                psutil==5.9.0  \
-                numpy==1.25.2
+conda env update --file $HOME/environment.yml --name base
 
 sudo chown -R ubuntu:ubuntu /usr/local/*
 sudo chown -R ubuntu:ubuntu /usr/lib/python3/*
@@ -127,7 +96,7 @@ fi
 wget -P $HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8/python/model \
 https://raw.githubusercontent.com/intel/intel-extension-for-pytorch/release/2.1/intel_extension_for_pytorch/nn/modules/merged_embeddingbag.py
 
-patch $HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8/python/model/merged_embeddingbag.py < $HOME/mlperf_patches/merged_embeddingbag.patch 
+patch $HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8/python/model/merged_embeddingbag.py < $HOME/mlperf_patches/merged_embeddingbag.patch
 
 # Set target QPS as per test configuration
 if [ -n "$target_qps" ]; then

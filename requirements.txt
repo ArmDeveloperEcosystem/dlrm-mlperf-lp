@@ -1,5 +1,0 @@
---extra-index-url https://download.pytorch.org/whl/nightly/cpu
-tensordict==0.1.2
-torchsnapshot==0.1.0
-fbgemm_gpu==2025.1.22+cpu
-torchrec==1.1.0.dev20250127+cpu

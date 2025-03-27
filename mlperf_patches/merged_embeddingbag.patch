@@ -1,20 +1,20 @@
 --- merged_embeddingbag.py	2025-02-04 19:06:56.641676747 +0000
-+++ dlrm_docker_setup/mlperf_patches/merged_embeddingbag.py	2025-02-04 03:54:18.382281512 +0000
++++ dlrm-mlperf-lp/mlperf_patches/merged_embeddingbag.py	2025-02-04 03:54:18.382281512 +0000
 @@ -5,18 +5,15 @@
  from itertools import accumulate
  import enum
- 
+
 -
  class PoolingMode(enum.IntEnum):
      SUM = 0
      MEAN = 1
- 
+
 -
  class SGDArgs(NamedTuple):
      bf16_trail: List[Optional[torch.Tensor]]
      weight_decay: float
      lr: float
- 
+
 -
  class EmbeddingSpec(NamedTuple):
      num_of_features: int
@@ -22,7 +22,7 @@
 @@ -25,7 +22,6 @@
      weight: Optional[torch.Tensor]
      sparse: bool
- 
+
 -
  def merged_embeddingbag(
      indices, offsets, indices_with_row_offsets, row_offsets, pooling_modes, *weights
@@ -37,8 +37,8 @@
 +    include_last_offset = False
 +    return torch.nn.functional.embedding_bag(
 +        weights, indices, offsets, mode=pooling_modes, include_last_offset=include_last_offset )
- 
- 
+
+
  def merged_embeddingbag_with_cat(
      weights,
      indices,
@@ -56,8 +56,8 @@
 +    embedding_output = torch.nn.functional.embedding_bag(input=indices, weight=weights, mode='sum')
 +    return torch.cat((
 +        embedding_output, dense_feature), dim=1)
- 
- 
+
+
  def merged_embeddingbag_sgd(
 @@ -77,10 +73,7 @@
              sgd_args,
@@ -68,7 +68,7 @@
 -    )
 -
 +    return torch.nn.functional.embedding_bag(input=indices, weight=weights, offset=offset, pooling_modes=pooling_modes)
- 
+
  class MergedEmbeddingBagFunc(Function):
      @staticmethod
 @@ -97,8 +90,12 @@
@@ -112,7 +112,7 @@
 -        return MergedEmbeddingBagFunc.unpack(*output)
 -
 +        return output
- 
+
  class MergedEmbeddingBagSGDFunc(Function):
      @staticmethod
 @@ -145,9 +140,7 @@
@@ -160,7 +160,7 @@
          n_tables = len(weights)
          output = [None for i in range(n_tables + 6)]
          return MergedEmbeddingBagSGDFunc.unpack(*output)
- 
+
 -
  class MergedEmbeddingBag(nn.Module):
      r"""
@@ -177,7 +177,7 @@
 @@ -418,7 +411,6 @@
              *self.weights
          )
- 
+
 -
  class MergedEmbeddingBagWithSGD(MergedEmbeddingBag):
      r"""
@@ -207,7 +207,7 @@
 @@ -570,7 +561,6 @@
              )
          return cls(embedding_specs, lr, weight_decay)
- 
+
 -
  class MergedEmbeddingBagWithCat(MergedEmbeddingBag):
      r"""
