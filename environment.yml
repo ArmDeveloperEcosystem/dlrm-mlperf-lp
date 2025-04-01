@@ -9,13 +9,13 @@ dependencies:
   - pyyaml=6.0
   - setuptools=68.0.0
   - cffi=1.15.1
-  - typing_extensions=4.7.1
   - future=0.18.3
   - six=1.16.0
   - requests=2.31.0
   - dataclasses=0.8
   - psutil=5.9.0
   - chardet
+  - typing_extensions=4.13.0
   - pip
   - pip:
       - absl-py==1.4.0
@@ -30,7 +30,9 @@ dependencies:
       - iopath @ git+https://github.com/facebookresearch/iopath
       - tensordict==0.1.2
       - torchsnapshot==0.1.0
+      - --extra-index-url https://download.pytorch.org/whl/cpu
       - fbgemm_gpu==1.1.0
       - torchrec==1.1.0
       - numpy==1.25.2
-      - --extra-index-url https://download.pytorch.org/whl/cpu
+      - --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+      - torch==2.8.0.dev20250324+cpu

@@ -10,7 +10,8 @@ set -ex
 data_type=${1:-"int8"}
 
 cd $HOME
-
+dlrm_setup_dir=$HOME/dlrm_setup/
+dlrm_test_path="$HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8"
 
 sudo apt update
 
@@ -41,7 +42,7 @@ if [ -d "/opt/conda" ]; then
     echo "Miniconda is already installed at /opt/conda. Skipping installation."
 else
     echo "Miniconda not found. Proceeding with installation..."
-
+    
     wget -O "$HOME/miniconda.sh" https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
     chmod +x "$HOME/miniconda.sh"
     # Install Miniconda silently (-b flag)
@@ -58,7 +59,8 @@ fi
 export PATH="/opt/conda/bin:$PATH"
 echo 'export PATH="/opt/conda/bin:$PATH"' >> ~/.bashrc
 
-conda env update --file $HOME/environment.yml --name base
+conda env update --file $dlrm_setup_dir/environment.yml --name base
+
 
 sudo chown -R ubuntu:ubuntu /usr/local/*
 sudo chown -R ubuntu:ubuntu /usr/lib/python3/*
@@ -72,7 +74,7 @@ git submodule update --init --recursive && cd loadgen
 CFLAGS="-std=c++14" python setup.py bdist_wheel
 pip install dist/*.whl
 
-# clone Intel MLperf Repo
+# clone Intel MLPerf Repo
 cd $HOME
 rm -rf inference_results_v4.0
 git clone https://github.com/mlcommons/inference_results_v4.0.git
@@ -85,32 +87,32 @@ num_proc=$(nproc)
 if [ "$data_type" = "fp32" ]; then
     echo "Applying fp32 patch"
     target_qps=$((8 * num_proc))
-    git apply $HOME/mlperf_patches/arm_fp32.patch
+    git apply $dlrm_setup_dir/mlperf_patches/arm_fp32.patch
 else
     echo "Applying int8 patch"
     target_qps=$((30 * num_proc))
-    git apply $HOME/mlperf_patches/arm_int8.patch
+    git apply $dlrm_setup_dir/mlperf_patches/arm_int8.patch
 fi
 
 # Download & Patch the Embedding code
-wget -P $HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8/python/model \
+wget -P $dlrm_test_path/python/model \
 https://raw.githubusercontent.com/intel/intel-extension-for-pytorch/release/2.1/intel_extension_for_pytorch/nn/modules/merged_embeddingbag.py
 
-patch $HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8/python/model/merged_embeddingbag.py < $HOME/mlperf_patches/merged_embeddingbag.patch
+patch $dlrm_test_path/python/model/merged_embeddingbag.py < $dlrm_setup_dir/mlperf_patches/merged_embeddingbag.patch 
 
 # Set target QPS as per test configuration
 if [ -n "$target_qps" ]; then
-	    cd $HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8/
+	    cd $dlrm_test_path/
 	        sed -i.bak "s/dlrm\.Offline\.target_qps = [0-9.]*/dlrm.Offline.target_qps = $target_qps/" user_default.conf
 fi
 
 # set number of cores in the config
-cd $HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8/
+cd $dlrm_test_path/
 sed -i "s/^number_cores = .*/number_cores = $(nproc)/" user_default.conf
 
 echo "Target QPS is changed"
 cat user_default.conf
 
 ## link int8 model
-cd $HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8/
+cd $dlrm_test_path/
 ln -s $HOME/model/aarch64_dlrm_int8.pt dlrm_int8.pt
