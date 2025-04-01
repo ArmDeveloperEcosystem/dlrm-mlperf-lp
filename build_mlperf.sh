@@ -10,7 +10,7 @@ set -ex
 data_type=${1:-"int8"}
 
 cd $HOME
-dlrm_setup_dir=$HOME/dlrm_setup/
+dlrm_setup_dir=$HOME/dlrm-mlperf-lp
 dlrm_test_path="$HOME/inference_results_v4.0/closed/Intel/code/dlrm-v2-99.9/pytorch-cpu-int8"
 
 sudo apt update

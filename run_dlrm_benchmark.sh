@@ -12,7 +12,7 @@ echo -e "${yellow}Data type chosen for the setup is $data_type${reset}"
 data_dir=$HOME/data/
 model_dir=$HOME/model/
 results_dir=$HOME/results/
-dlrm_setup_dir=$HOME/dlrm_setup/
+dlrm_setup_dir=$HOME/dlrm-mlperf-lp
 
 export CONDA_PREFIX=/opt/conda
 export NUM_SOCKETS="1"
