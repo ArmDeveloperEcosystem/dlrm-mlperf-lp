@@ -31,8 +31,6 @@ dependencies:
       - tensordict==0.1.2
       - torchsnapshot==0.1.0
       - --extra-index-url https://download.pytorch.org/whl/cpu
-      - fbgemm_gpu==1.1.0
-      - torchrec==1.1.0
-      - numpy==1.25.2
-      - --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-      - torch==2.8.0.dev20250324+cpu
+      - torch==2.9.0+cpu
+      - torchrec==1.4.0+cpu
+      - fbgemm_gpu==1.4.0+cpu
