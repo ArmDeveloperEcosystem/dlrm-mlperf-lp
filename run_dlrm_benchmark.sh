@@ -14,6 +14,9 @@ model_dir=$HOME/model/
 results_dir=$HOME/results/
 dlrm_setup_dir=$HOME/dlrm-mlperf-lp
 
+export DATA_DIR=$data_dir
+export MODEL_DIR=$model_dir
+
 export CONDA_PREFIX=/opt/conda
 export NUM_SOCKETS="1"
 export CPUS_PER_SOCKET=$(nproc)
@@ -41,7 +44,7 @@ if [ -f "$HOME/model/$dumped_fp32_model" ]; then
     echo -e "${yellow}File '$dumped_fp32_model' exists. Skipping model dumping step.${reset}"
 else
     echo -e "${yellow}File '$dumped_fp32_model' does not exist. Dumping the model weights...${reset}"
-    bash -c " cd $dlrm_test_path && python python/dump_torch_model.py --model-path=$model_dir/model_weights --dataset-path=$data_dir"
+    bash -c " cd $dlrm_test_path && python python/dump_torch_model.py --model-path=$MODEL_DIR/model_weights --dataset-path=$DATA_DIR"
 fi
  
  
@@ -63,7 +66,7 @@ fi
  
 # Run the offline test
 echo -e "${yellow}Running offline test...${reset}"
-bash -c "cd $dlrm_test_path && MODEL_DIR=$model_dir DATA_DIR=$data_dir bash run_main.sh offline $data_type"
+bash -c "cd $dlrm_test_path && bash run_main.sh offline $data_type"
  
 # Copy results to the host machine
 echo -e "${yellow}Copying results to host...${reset}"

@@ -37,27 +37,29 @@ sudo chown -R ubuntu:ubuntu *
 
 #!/bin/bash
 
-# Check if Miniconda is already installed
+# Check if Miniforge is already installed
 if [ -d "/opt/conda" ]; then
-    echo "Miniconda is already installed at /opt/conda. Skipping installation."
+    echo "Miniforge is already installed at /opt/conda. Skipping installation."
 else
-    echo "Miniconda not found. Proceeding with installation..."
+    echo "Miniforge not found. Proceeding with installation..."
     
-    wget -O "$HOME/miniconda.sh" https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
-    chmod +x "$HOME/miniconda.sh"
-    # Install Miniconda silently (-b flag)
-    sudo bash "$HOME/miniconda.sh" -b -p /opt/conda
+    wget -O "$HOME/miniforge.sh" https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh
+    chmod +x "$HOME/miniforge.sh"
+    # Install Miniforge silently (-b flag)
+    sudo bash "$HOME/miniforge.sh" -b -p /opt/conda
     # Change ownership to the user
     sudo chown -R ubuntu:ubuntu /opt/conda
     # Remove the installer
-    rm "$HOME/miniconda.sh"
-    echo "Miniconda installation completed."
+    rm "$HOME/miniforge.sh"
+    echo "Miniforge installation completed."
 fi
 
 /opt/conda/bin/conda clean -ya
 
 export PATH="/opt/conda/bin:$PATH"
 echo 'export PATH="/opt/conda/bin:$PATH"' >> ~/.bashrc
+
+python -m pip install --upgrade pip
 
 conda env update --file $dlrm_setup_dir/environment.yml --name base
 
@@ -116,3 +118,4 @@ cat user_default.conf
 ## link int8 model
 cd $dlrm_test_path/
 ln -s $HOME/model/aarch64_dlrm_int8.pt dlrm_int8.pt
+
